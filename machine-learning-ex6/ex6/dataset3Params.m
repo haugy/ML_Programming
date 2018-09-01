@@ -28,9 +28,9 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
-l = [0.001 0.003 0.01 0.03 0.1 0.3 1 3 10 30 100];
+l = [0.01 0.03 0.1 0.3 1 3 10 30];
 %cross validation
-P_cross = 0;
+P_cross = 1;
 best_C = 1;
 best_sigma = 0.3;
 %C optimal
@@ -38,8 +38,8 @@ for sigma = l(1:end)
   for C = l(1:end)
     model = svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma));
     predictions = svmPredict(model, Xval);
-    p = mean(double(predictions == yval));
-    if p > P_cross
+    p = mean(double(predictions ~= yval));
+    if p < P_cross
       P_cross = p;
       best_C = C;
       best_sigma = sigma;
