@@ -10,6 +10,11 @@ function [C, sigma] = dataset3Params(X, y, Xval, yval)
 % You need to return the following variables correctly.
 C = 1;
 sigma = 0.3;
+%model= svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma)); 
+%visualizeBoundary(X, y, model);
+%predictions = svmPredict(model, Xval)
+%p = mean(double(predictions ~= yval))
+%pause;
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: Fill in this function to return the optimal C and sigma
@@ -23,30 +28,26 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+l = [0.001 0.003 0.01 0.03 0.1 0.3 1 3 10 30 100];
 %cross validation
 P_cross = 0;
+best_C = 1;
+best_sigma = 0.3;
 %C optimal
-while 1
-  model = svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma)); 
-  predictions = svmPredict(model, Xval);
-  p = mean(double(predictions ~= yval));
-  if p < P_cross
-    break;
+for sigma = l(1:end)
+  for C = l(1:end)
+    model = svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma));
+    predictions = svmPredict(model, Xval);
+    p = mean(double(predictions == yval));
+    if p > P_cross
+      P_cross = p;
+      best_C = C;
+      best_sigma = sigma;
+    end;
   end;
-  P_cross = p;
-  C = C + 1;
 end;
-%sigma optimal
-while 1
-  model = svmTrain(X, y, C, @(x1, x2) gaussianKernel(x1, x2, sigma)); 
-  predictions = svmPredict(model, Xval);
-  p = mean(double(predictions ~= yval));
-  if p < P_cross
-    break;
-  end;
-  P_cross = p;
-  sigma = sigma + 1;
-end;
+C = best_C;
+sigma = best_sigma;
 
 % =========================================================================
 
